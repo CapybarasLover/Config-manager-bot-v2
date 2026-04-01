@@ -1,13 +1,11 @@
 package com.petr.panel.service;
 
-public class ConfigServiceGermanImpl implements ConfigService{
-    @Override
-    public String createVlessLink(String uuid, String name) {
+public class ConfigServiceGermImpl implements ConfigService{
+    private String createVlessLink(String name) {
         return "";
     }
 
-    @Override
-    public String createSubLink(String subUuid) {
+    private String createSubLink() {
         return "";
     }
 

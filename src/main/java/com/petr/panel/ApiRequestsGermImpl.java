@@ -1,11 +1,9 @@
 package com.petr.panel;
 
 import com.petr.exception.LoginException;
-import lombok.SneakyThrows;
-import org.hibernate.type.format.jaxb.JaxbXmlFormatMapper;
+import com.petr.exception.RetryAttemptsLeftException;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
 import java.net.URI;
@@ -14,13 +12,14 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
-import java.sql.SQLSyntaxErrorException;
 import java.util.UUID;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 
-public class ApiRequestsImpl implements ApiRequests {
+public class ApiRequestsGermImpl implements ApiRequests {
     private final int MAX_RETRIES = 2;
+    @FunctionalInterface
+    private interface ThrowingSupplier<T> {
+        T get() throws Exception;
+    }
 
     private final CookieManager cookies = new CookieManager(null, CookiePolicy.ACCEPT_ALL);
     private final HttpClient client = HttpClient.newBuilder().cookieHandler(cookies).build();
@@ -42,7 +41,7 @@ public class ApiRequestsImpl implements ApiRequests {
 //        login();
 //    }
     // TODO Раскомментить!!!!!!!!!!!!! после дебага
-    private <T> T retry(Supplier<T> requestToRetry){
+    private <T> T retry(ThrowingSupplier<T> requestToRetry){
         int attempts = 0;
 
         while(attempts < MAX_RETRIES){
@@ -57,8 +56,7 @@ public class ApiRequestsImpl implements ApiRequests {
                 attempts++;
             }
         }
-
-        return null;
+        throw new RetryAttemptsLeftException("To many attempts",  MAX_RETRIES);
     }
 
     private void login() throws LoginException, IOException, InterruptedException {
@@ -96,7 +94,6 @@ public class ApiRequestsImpl implements ApiRequests {
         return "";
     }
 
-    @SneakyThrows
     @Override
     public HttpResponse<String> getAllConfigsRequest() throws IOException, InterruptedException {
         URI getConfigsUrl = baseUri.resolve("panel/api/inbounds/list");
