@@ -1,4 +1,11 @@
 package com.petr.panel;
 
-public class ApiRequests {
+import java.io.IOException;
+import java.net.http.HttpResponse;
+import java.util.UUID;
+
+public interface ApiRequests {
+    String addClientRequest(String inboundId, UUID uuid, UUID subUuid, String name);
+    HttpResponse<String> getAllConfigsRequest() throws IOException, InterruptedException;
+    String deleteClient(String inboundId, String name);
 }
