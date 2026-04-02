@@ -93,7 +93,7 @@ public class ApiRequestsGermImpl implements ApiRequests {
     }
 
     @Override
-    public String addClientRequest(String inboundId, UUID uuid, UUID subUuid, String configName, double tgId) throws IOException, InterruptedException {
+    public String addClientRequest(String inboundId, UUID uuid, UUID subUuid, String configName, long tgId) throws IOException, InterruptedException {
         return executeWithRetry(()-> {
             URI addClientUrl = baseUri.resolve("panel/api/inbounds/addClient");
 

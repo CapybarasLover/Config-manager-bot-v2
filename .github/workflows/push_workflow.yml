@@ -1,4 +1,6 @@
-name: commitWorkflow.yml
+name: push_workflow.yml
 on:
-
+  push:
+    branches: [ master ]
 jobs:
+
