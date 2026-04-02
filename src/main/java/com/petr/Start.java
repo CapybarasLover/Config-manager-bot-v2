@@ -11,6 +11,7 @@ public class Start {
 //        Bot bot = new Bot();
 //        bot.startBot();
         ApiRequests api = new ApiRequestsGermImpl();
-
+        UUID uuid = UUID.randomUUID();
+        System.out.println(api.deleteClient("1", "pipopipopipo"));
     }
 }

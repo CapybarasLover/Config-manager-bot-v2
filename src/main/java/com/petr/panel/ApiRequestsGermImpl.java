@@ -38,9 +38,9 @@ public class ApiRequestsGermImpl implements ApiRequests {
             "\"comment\": \"created from tg bot\", " +
             "\"reset\": 0 }]}";
 
-//    public void ApiRequests() throws IOException, InterruptedException {
-//        login();
-//    }
+    public void ApiRequests() throws IOException, InterruptedException {
+        login();
+    }
 
     private <T> T executeWithRetry(ThrowingSupplier<T> requestToRetry) throws IOException, InterruptedException {
         int attempts = 0;
@@ -93,11 +93,11 @@ public class ApiRequestsGermImpl implements ApiRequests {
     }
 
     @Override
-    public String addClientRequest(String inboundId, UUID uuid, UUID subUuid, String name, double tgId) throws IOException, InterruptedException {
+    public String addClientRequest(String inboundId, UUID uuid, UUID subUuid, String configName, double tgId) throws IOException, InterruptedException {
         return executeWithRetry(()-> {
             URI addClientUrl = baseUri.resolve("panel/api/inbounds/addClient");
 
-            String settings = String.format(settingsTemplate, uuid.toString(), name, tgId, subUuid);
+            String settings = String.format(settingsTemplate, uuid.toString(), configName, tgId, subUuid);
 
             String body = "id=" + URLEncoder.encode(inboundId, StandardCharsets.UTF_8) +
                     "&settings=" + URLEncoder.encode(settings, StandardCharsets.UTF_8);
@@ -129,16 +129,30 @@ public class ApiRequestsGermImpl implements ApiRequests {
 
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-            if(response.statusCode() == 404){
+            if(response.statusCode() != 200){
                 throw new RequestException("Bad status", response.statusCode());
             }
-
             return response;
         });
     }
 
     @Override
-    public String deleteClient(String inboundId, String name) {
-        return "";
+    public String deleteClient(String inboundId, String configName) throws IOException, InterruptedException {
+        return executeWithRetry(() -> {
+            URI deleteClientUrl = baseUri.resolve(String
+                    .format("panel/api/inbounds/%s/delClientByEmail/%s", inboundId, configName));
+
+            HttpRequest request = HttpRequest.newBuilder(deleteClientUrl)
+                    .POST(HttpRequest.BodyPublishers.noBody())
+                    .header("Content-Type", "application/x-www-form-urlencoded")
+                    .build();
+
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+            if(response.statusCode() != 200){
+                throw new RequestException("Bad status", response.statusCode());            }
+
+            return "Клиент " + configName + " удален!";
+        });
     }
 }
