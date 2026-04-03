@@ -1,4 +1,4 @@
---liquibase formated sql
+--liquibase formatted sql
 
 --changeset create-config-table
 
