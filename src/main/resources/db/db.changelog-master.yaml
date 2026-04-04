@@ -1,0 +1,8 @@
+databaseChangeLog:
+  - include:
+      file: changeset/create-user-table.sql
+      relativeToChangelogFile: true
+
+  - include:
+      file: changeset/create-config-table.sql
+      relativeToChangelogFile: true
