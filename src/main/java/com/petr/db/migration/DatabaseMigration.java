@@ -17,8 +17,10 @@ public class DatabaseMigration {
         String dbLink;
         if(execParam.equals("prod")){
             dbLink = System.getenv("DB_LINK_PROD");
-        } else {
+        } else if(execParam.equals("dev")){
             dbLink = System.getenv("DB_LINK_TEST");
+        } else {
+            throw new IllegalArgumentException("Unknown parameter: " + execParam);
         }
 
         String username = System.getenv("DB_USER");
