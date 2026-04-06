@@ -260,12 +260,41 @@ public class Bot {
                 state = "admin_state"
         )
         void onAdminMessage(BotContext bot, Message message) throws IOException, InterruptedException {
-            Long userChatId = Long.parseLong(message.text.split(", ")[1]);
+            Long userId = Long.parseLong(message.text.split(", ")[1]);
             if(message.text.contains("Yey")){
-                configManager.acceptConfig(userChatId);
-                runGetConfig(bot, userChatId, "", true);
-            } else if(message.text.contains("Nay")){
+                configManager.acceptConfig(userId);
+                runGetConfig(bot, userId, "", true);
 
+                Long[] adminChats = {
+                        Long.parseLong(System.getenv("ADMIN_CHATS").split(",")[0]),
+                        Long.parseLong(System.getenv("ADMIN_CHATS").split(",")[1])
+                };
+
+                String displayUsername = configManager.getUsernameById(userId);
+                String safeUsername = escapeMarkdown(displayUsername);
+                String safeChatId = escapeMarkdown(String.valueOf(userId));
+                for(var admin : adminChats){
+                    bot.sendMessage(admin, String.format("""
+                                    Пользователю с ником @%s (userid: %s) одобрен конфиг!
+                                    """, safeUsername, safeChatId, safeChatId, safeChatId)
+                    ).parseMode(ParseMode.MARKDOWN).exec();
+                }
+            } else if(message.text.contains("Nay")){
+                Long[] adminChats = {
+                        Long.parseLong(System.getenv("ADMIN_CHATS").split(",")[0]),
+                        Long.parseLong(System.getenv("ADMIN_CHATS").split(",")[1])
+                };
+
+                String displayUsername = configManager.getUsernameById(userId);
+                String safeUsername = escapeMarkdown(displayUsername);
+                String safeChatId = escapeMarkdown(String.valueOf(userId));
+                for(var admin : adminChats) {
+                    bot.sendMessage(admin, String.format("""
+                            Пользователю с ником @%s (userid: %s) отказано в конфиге
+                            """, safeUsername, safeChatId, safeChatId, safeChatId)
+                    ).parseMode(ParseMode.MARKDOWN).exec();
+                }
+                configManager.deleteConfig(userId);
             }
         }
 

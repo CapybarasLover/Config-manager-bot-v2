@@ -28,7 +28,7 @@ public class ConfigManagerImpl implements ConfigManager {
             System.out.println(dbService.setConfig(userId, username, configs[0], configs[1]));
             System.out.println(dbService.setUserHasConfig(userId, true));
 
-            return new String[]{};
+            return new String[]{};// TODO переделать так чтобы в первой строке возвращался ответ почему конфиг не вернулся
         } else {
             return new String[]{};
         }
@@ -44,9 +44,11 @@ public class ConfigManagerImpl implements ConfigManager {
     }
 
     @Override
-    public String deleteConfig(String clientName) {
-
-        return "";
+    public String deleteConfig(Long userId) throws IOException, InterruptedException {
+        String configName = dbService.getConfigNameByUserId(userId);
+        dbService.deleteConfigByUserId(userId);
+        panelService.deleteClient(configName);
+        return "Конфиг удален!";
     }
 
     @Override
@@ -70,5 +72,10 @@ public class ConfigManagerImpl implements ConfigManager {
     @Override
     public boolean isRegistered(long id) {
         return dbService.findUserById(id) != null;
+    }
+
+    @Override
+    public String getUsernameById(Long id) {
+        return dbService.findUserById(id).getTgName();
     }
 }

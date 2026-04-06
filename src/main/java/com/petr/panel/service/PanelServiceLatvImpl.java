@@ -16,8 +16,8 @@ public class PanelServiceLatvImpl implements PanelService {
     }
 
     @Override
-    public String deleteClient(String clientId) throws IOException, InterruptedException {
-        return api.deleteClient("1", clientId);
+    public String deleteClient(String clientName) throws IOException, InterruptedException {
+        return api.deleteClient("1", clientName);
     }
 
     @Override

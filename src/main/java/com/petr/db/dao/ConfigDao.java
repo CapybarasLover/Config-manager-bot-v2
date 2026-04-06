@@ -47,4 +47,15 @@ public class ConfigDao {
             return session.find(Config.class, userId);
         }
     }
+
+    public void deleteConfigByUserId(Long userId) {
+        try(Session session = this.sessionFactory.openSession()) {
+            Transaction tx = session.beginTransaction();
+            Config config = session.find(Config.class, userId);
+            if (config != null) {
+                session.remove(config);
+            }
+            tx.commit();
+        }
+    }
 }
