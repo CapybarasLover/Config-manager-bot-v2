@@ -12,6 +12,7 @@ import io.github.natanimn.telebof.types.bot.BotCommand;
 import io.github.natanimn.telebof.types.updates.Message;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.regex.Pattern;
 
 public class Bot {
@@ -205,10 +206,7 @@ public class Bot {
                         Ваш конфиг создан, но еще подтвержден админом.
                         Ожидайте...
                         """).exec();
-                Long[] adminChats = {
-                        Long.parseLong(System.getenv("ADMIN_CHATS").split(",")[0]),
-                        Long.parseLong(System.getenv("ADMIN_CHATS").split(",")[1])
-                };
+                Long[] adminChats = getAdminChats();
                 String displayUsername = stripOptionalConfigSuffix(username);
                 String safeUsername = escapeMarkdown(displayUsername);
                 String safeChatId = escapeMarkdown(String.valueOf(chatId));
@@ -265,10 +263,7 @@ public class Bot {
                 configManager.acceptConfig(userId);
                 runGetConfig(bot, userId, "", true);
 
-                Long[] adminChats = {
-                        Long.parseLong(System.getenv("ADMIN_CHATS").split(",")[0]),
-                        Long.parseLong(System.getenv("ADMIN_CHATS").split(",")[1])
-                };
+                Long[] adminChats = getAdminChats();
 
                 String displayUsername = configManager.getUsernameById(userId);
                 String safeUsername = escapeMarkdown(displayUsername);
@@ -280,10 +275,7 @@ public class Bot {
                     ).parseMode(ParseMode.MARKDOWN).exec();
                 }
             } else if(message.text.contains("Nay")){
-                Long[] adminChats = {
-                        Long.parseLong(System.getenv("ADMIN_CHATS").split(",")[0]),
-                        Long.parseLong(System.getenv("ADMIN_CHATS").split(",")[1])
-                };
+                Long[] adminChats = getAdminChats();
 
                 String displayUsername = configManager.getUsernameById(userId);
                 String safeUsername = escapeMarkdown(displayUsername);
@@ -297,8 +289,6 @@ public class Bot {
                 configManager.deleteConfig(userId);
             }
         }
-
-        // test
 
         @MessageHandler(
                 filter = isAdmin.class,
@@ -320,6 +310,15 @@ public class Bot {
             context.sendMessage(message.chat.id, """
                 Я вас не понял, напишите /help чтобы увидеть доступные команды.
                 """).exec();
+        }
+
+        private Long[] getAdminChats(){
+            String[] adminIdsString = System.getenv("ADMIN_CHATS").split(",");
+            Long[] adminChats = new Long[adminIdsString.length];
+            for(int i = 0; i < adminIdsString.length; i++){
+                adminChats[i] = Long.parseLong(adminIdsString[i]);
+            }
+            return adminChats;
         }
     }
 }
