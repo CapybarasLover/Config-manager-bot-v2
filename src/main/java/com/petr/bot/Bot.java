@@ -12,6 +12,7 @@ import io.github.natanimn.telebof.types.bot.BotCommand;
 import io.github.natanimn.telebof.types.updates.Message;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.regex.Pattern;
 
 public class Bot {
@@ -205,10 +206,7 @@ public class Bot {
                         Ваш конфиг создан, но еще подтвержден админом.
                         Ожидайте...
                         """).exec();
-                Long[] adminChats = {
-                        Long.parseLong(System.getenv("ADMIN_CHATS").split(",")[0]),
-                        Long.parseLong(System.getenv("ADMIN_CHATS").split(",")[1])
-                };
+                Long[] adminChats = getAdminChats();
                 String displayUsername = stripOptionalConfigSuffix(username);
                 String safeUsername = escapeMarkdown(displayUsername);
                 String safeChatId = escapeMarkdown(String.valueOf(chatId));
@@ -260,12 +258,35 @@ public class Bot {
                 state = "admin_state"
         )
         void onAdminMessage(BotContext bot, Message message) throws IOException, InterruptedException {
-            Long userChatId = Long.parseLong(message.text.split(", ")[1]);
+            Long userId = Long.parseLong(message.text.split(", ")[1]);
             if(message.text.contains("Yey")){
-                configManager.acceptConfig(userChatId);
-                runGetConfig(bot, userChatId, "", true);
-            } else if(message.text.contains("Nay")){
+                configManager.acceptConfig(userId);
+                runGetConfig(bot, userId, "", true);
 
+                Long[] adminChats = getAdminChats();
+
+                String displayUsername = configManager.getUsernameById(userId);
+                String safeUsername = escapeMarkdown(displayUsername);
+                String safeChatId = escapeMarkdown(String.valueOf(userId));
+                for(var admin : adminChats){
+                    bot.sendMessage(admin, String.format("""
+                                    Пользователю с ником @%s (userid: %s) одобрен конфиг!
+                                    """, safeUsername, safeChatId, safeChatId, safeChatId)
+                    ).parseMode(ParseMode.MARKDOWN).exec();
+                }
+            } else if(message.text.contains("Nay")){
+                Long[] adminChats = getAdminChats();
+
+                String displayUsername = configManager.getUsernameById(userId);
+                String safeUsername = escapeMarkdown(displayUsername);
+                String safeChatId = escapeMarkdown(String.valueOf(userId));
+                for(var admin : adminChats) {
+                    bot.sendMessage(admin, String.format("""
+                            Пользователю с ником @%s (userid: %s) отказано в конфиге
+                            """, safeUsername, safeChatId, safeChatId, safeChatId)
+                    ).parseMode(ParseMode.MARKDOWN).exec();
+                }
+                configManager.deleteConfig(userId);
             }
         }
 
@@ -289,6 +310,15 @@ public class Bot {
             context.sendMessage(message.chat.id, """
                 Я вас не понял, напишите /help чтобы увидеть доступные команды.
                 """).exec();
+        }
+
+        private Long[] getAdminChats(){
+            String[] adminIdsString = System.getenv("ADMIN_CHATS").split(",");
+            Long[] adminChats = new Long[adminIdsString.length];
+            for(int i = 0; i < adminIdsString.length; i++){
+                adminChats[i] = Long.parseLong(adminIdsString[i]);
+            }
+            return adminChats;
         }
     }
 }

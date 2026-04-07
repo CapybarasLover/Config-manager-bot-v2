@@ -42,6 +42,10 @@ public class DbService {
         return userDao.getUserHasConfig(tgId) && Objects.equals(userDao.getUserStatus(tgId), "a");
     }
 
+    public String getConfigNameByUserId(Long userId){
+        return configDao.getConfigByUserId(userId).getConfigName();
+    }
+
     public String[] getConfigsById(Long tgId) {
         Config config = configDao.getConfigByUserId(tgId);
         if(config == null){
@@ -60,5 +64,11 @@ public class DbService {
 
     public void setUserStatusAccepted(Long tgId) {
         userDao.setUserStatus("a", tgId);
+    }
+
+    public void deleteConfigByUserId(Long userId) {
+        configDao.deleteConfigByUserId(userId);
+        userDao.setUserHasConfig(userId, false);
+        userDao.setUserStatus("d", userId);
     }
 }
