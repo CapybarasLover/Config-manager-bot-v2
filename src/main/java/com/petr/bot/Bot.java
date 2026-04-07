@@ -298,6 +298,8 @@ public class Bot {
             }
         }
 
+        // test
+
         @MessageHandler(
                 filter = isAdmin.class,
                 state = "admin_state",
