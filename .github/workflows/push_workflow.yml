@@ -1,4 +1,4 @@
-name: push_workflow.yml
+name: deploy_new
 on:
   push:
     branches: [ master ]
@@ -48,10 +48,14 @@ jobs:
             echo "ADMIN_CHATS="
           } > env.txt
 
-      - name: Docker Compose
+      - name: Docker Compose build new bot image
         run: |
-          docker compose down --remove-orphans || true
-          docker compose up --build -d
+          docker compose build bot
+
+
+      - name: Docker Compose up new bot
+        run: |
+          docker compose up -d --no-deps bot
           sleep 20
           docker compose ps
 
