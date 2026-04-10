@@ -255,10 +255,21 @@ public class Bot {
 
         @MessageHandler(
                 filter = isAdmin.class,
-                state = "admin_state"
+                state = "admin_state",
+                priority = 2
         )
         void onAdminMessage(BotContext bot, Message message) throws IOException, InterruptedException {
-            Long userId = Long.parseLong(message.text.split(", ")[1]);
+            long userId;
+            try{
+                userId = Long.parseLong(message.text.split(", ")[1]);
+            }catch (ArrayIndexOutOfBoundsException ex){
+                System.out.println(ex);
+                bot.sendMessage(message.chat.id, """
+                        Я вас не понял! повторите...
+                        """).exec();
+                return;
+            }
+
             if(message.text.contains("Yey")){
                 configManager.acceptConfig(userId);
                 runGetConfig(bot, userId, "", true);

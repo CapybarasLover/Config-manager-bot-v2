@@ -8,6 +8,16 @@ import java.io.IOException;
 import java.util.UUID;
 
 public class PanelServiceLatvImpl implements PanelService {
+    public PanelServiceLatvImpl(){
+        String env = System.getProperty("app.env");
+        if(env.equals("prod")){
+            inboundId = "2";
+        } else {        // TODO FIX в дев среде все равно сохраняет в инбаунбд с айди 2
+            inboundId = "3";
+        }
+    }
+
+    private final String inboundId;
     private final ApiRequests api = new ApiRequestsLatvImpl();
 
     @Override
@@ -17,7 +27,7 @@ public class PanelServiceLatvImpl implements PanelService {
 
     @Override
     public String deleteClient(String clientName) throws IOException, InterruptedException {
-        return api.deleteClient("1", clientName);
+        return api.deleteClient(inboundId, clientName);
     }
 
     @Override
@@ -28,7 +38,7 @@ public class PanelServiceLatvImpl implements PanelService {
         String subLink = createSubLink(subUuid);
         String vlessLink = createVlessLink(clientName, uuid);
 
-        api.addClientRequest("2", uuid, subUuid, clientName, tgId);
+        api.addClientRequest(inboundId, uuid, subUuid, clientName, tgId);
 
         return new String[]{vlessLink, subLink};
     }

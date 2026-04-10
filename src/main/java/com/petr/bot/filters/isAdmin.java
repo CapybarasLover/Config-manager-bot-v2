@@ -11,17 +11,14 @@ public class isAdmin implements CustomFilter {
             return false;
         }
 
-        Long[] adminChats = {
-                Long.parseLong(System.getenv("ADMIN_CHATS").split(",")[0]),
-                Long.parseLong(System.getenv("ADMIN_CHATS").split(",")[1])
-        };
-
-        boolean isAdmin = false;
-
-        if(adminChats[0] == update.message.chat.id || adminChats[1] == update.message.chat.id){
-            isAdmin = true;
+        String[] adminIdsString = System.getenv("ADMIN_CHATS").split(",");
+        Long[] adminChats = new Long[adminIdsString.length];
+        for(int i = 0; i < adminIdsString.length; i++){
+             if(update.message.chat.id == Long.parseLong(adminIdsString[i])){
+                 return true;
+             }
         }
 
-        return isAdmin;
+        return false;
     }
 }

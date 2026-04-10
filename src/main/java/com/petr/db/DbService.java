@@ -6,6 +6,7 @@ import com.petr.db.entity.Config;
 import com.petr.db.entity.User;
 
 import java.util.Objects;
+import java.util.Random;
 
 public class DbService {
     final private ConfigDao configDao;
@@ -30,6 +31,11 @@ public class DbService {
     }
 
     public String setConfig(Long tgId, String configName, String vlessLink, String subLink) {
+        String env = System.getProperty("app.env");
+        if(env.equals("dev")){
+            int rand = new Random().nextInt();
+            configName = "TEST_" + configName + rand;
+        }
         configDao.saveConfig(tgId, configName, vlessLink, subLink);
         return "Конфиг сохранен успешно!";
     }

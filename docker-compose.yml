@@ -1,5 +1,4 @@
 services:
-#  TODO переписать под нужды бота
   bot:
     image: tg-config-bot
     build:
